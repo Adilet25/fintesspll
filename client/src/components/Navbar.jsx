@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import LogoImg from "../utils/Images/Logo.png";
+import LogoImg from "../utils/Images/Logo.svg";
 import { Link as LinkR, NavLink } from "react-router-dom";
 import { MenuRounded } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
@@ -110,14 +110,13 @@ const MobileMenu = styled.ul`
   flex-direction: column;
   align-items: start;
   gap: 16px;
-  padding: 0 6px;
   list-style: none;
-  width: 90%;
+  width:20%;
   padding: 12px 40px 24px 40px;
   background: ${({ theme }) => theme.bg};
   position: absolute;
   top: 80px;
-  right: 0;
+  left: 0px;
   transition: all 0.6s ease-in-out;
   transform: ${({ isOpen }) =>
     isOpen ? "translateY(0)" : "translateY(-100%)"};

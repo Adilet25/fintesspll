@@ -12,6 +12,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 36px;
+  back
 `;
 const Title = styled.div`
   font-size: 30px;
@@ -61,7 +62,7 @@ const SignIn = () => {
   return (
     <Container>
       <div>
-        <Title>Welcome to Fittrack 👋</Title>
+        <Title>Welcome to FitTrack 👋</Title>
         <Span>Please login with your details here</Span>
       </div>
       <div
