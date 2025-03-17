@@ -36,6 +36,7 @@ const connectDB = () => {
     .then(() => console.log("Connected to Mongo DB"))
     .catch((err) => {
       console.error("failed to connect with mongo");
+      console.log("MongoDB URL:", process.env.MONGODB_URL);
       console.error(err);
     });
 };
