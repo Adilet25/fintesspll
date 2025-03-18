@@ -36,6 +36,9 @@ const Section2 = styled.div`
   flex-direction: row;
   justify-content: space-between;
   gap: 22px;
+  @media (max-width: 1024px) {
+    flex-direction: column-reverse;
+  }
   @media (max-width: 600px) {
     gap: 12px;
   }
