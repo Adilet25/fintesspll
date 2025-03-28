@@ -38,7 +38,7 @@ const SignIn = () => {
   const responseMessage = async (response) => {
     console.log(response);
     try {
-      const res = await fetch('http://localhost:8080/auth/google/callback', {
+      const res = await fetch('https://fintesspll.onrender.com/api/auth/google/callback', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
