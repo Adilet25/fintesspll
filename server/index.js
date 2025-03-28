@@ -28,7 +28,14 @@ app.use((req, res, next) => {
   res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
   next();
 });
-
+app.use(
+  cors({
+    origin: "https://fitnesspll.netlify.app", // Allow only this origin
+    methods: "GET,POST,PUT,DELETE,PATCH,OPTIONS",
+    allowedHeaders: "Content-Type,Authorization",
+    credentials: true, // If you're using cookies/authentication
+  })
+);
 // Google OAuth - Auth route to exchange code for tokens
 app.post('/auth/google', async (req, res) => {
   try {
