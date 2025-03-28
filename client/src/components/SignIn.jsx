@@ -5,6 +5,7 @@ import Button from "./Button";
 import { UserSignIn } from "../api";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/reducers/userSlice";
+import { GoogleLogin } from '@react-oauth/google';
 
 const Container = styled.div`
   width: 100%;
@@ -12,13 +13,14 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 36px;
-  back
 `;
+
 const Title = styled.div`
   font-size: 30px;
   font-weight: 800;
   color: ${({ theme }) => theme.text_primary};
 `;
+
 const Span = styled.div`
   font-size: 16px;
   font-weight: 400;
@@ -31,6 +33,31 @@ const SignIn = () => {
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // Function to handle Google login response
+  const responseMessage = async (response) => {
+    console.log(response);
+    try {
+      const res = await fetch('http://localhost:8080/auth/google/callback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token: response.credential }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        dispatch(loginSuccess(data));
+        alert("Login Success");
+      } else {
+        alert(data.message || "Something went wrong");
+      }
+    } catch (error) {
+      console.error('Error during Google login:', error);
+      alert('Error during login');
+    }
+  };
 
   const validateInputs = () => {
     if (!email || !password) {
@@ -90,6 +117,12 @@ const SignIn = () => {
           onClick={handelSignIn}
           isLoading={loading}
           isDisabled={buttonDisabled}
+        />
+      </div>
+      <div>
+        <GoogleLogin
+          onSuccess={responseMessage} // Pass the Google response to the backend
+          onError={(error) => console.log('Login Failed:', error)}
         />
       </div>
     </Container>

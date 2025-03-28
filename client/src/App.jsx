@@ -8,6 +8,7 @@ import Navbar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
 import Workouts from "./pages/Workouts";
 import Tutorials from "./pages/Tutorials";
+import { GoogleOAuthProvider } from '@react-oauth/google'
 
 const Container = styled.div`
   width: 100%;
@@ -24,6 +25,8 @@ const Container = styled.div`
 function App() {
   const { currentUser } = useSelector((state) => state.user);
   return (
+    <GoogleOAuthProvider clientId="35772179722-n68k3scko2abidoq838mmedta0mn3jva.apps.googleusercontent.com">
+
     <ThemeProvider theme={lightTheme}>
       <BrowserRouter>
         {currentUser ? (
@@ -42,6 +45,7 @@ function App() {
         )}
       </BrowserRouter>
     </ThemeProvider>
+        </GoogleOAuthProvider>
   );
 }
 
