@@ -2,10 +2,9 @@ import express from "express";
 import * as dotenv from "dotenv";
 import cors from "cors";
 import mongoose from "mongoose";
-import { OAuth2Client } from "google-auth-library"; // Google OAuth client
-import passport from "./middleware/Passport.js"; // Passport middleware
+import { OAuth2Client } from "google-auth-library";
 import UserRoutes from "./routes/User.js";
-import User from "./models/User.js"; // Ensure you have a User model for database interactions
+import User from "./models/User.js"; // Ensure you have a User model
 
 dotenv.config();
 
@@ -18,26 +17,17 @@ const oAuth2Client = new OAuth2Client(
   'postmessage'
 );
 
-// Middleware setup
-app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true }));
-app.use(passport.initialize());
-app.use((req, res, next) => {
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
-  next();
-});
-app.use(
-  cors({
-    origin: "https://fitnesspll.netlify.app", // Allow only this origin
-    methods: "GET,POST,PUT,DELETE,PATCH,OPTIONS",
-    allowedHeaders: "Content-Type,Authorization",
-    credentials: true, // If you're using cookies/authentication
-  })
-);
-// Google OAuth - Auth route to exchange code for tokens
-app.post('/auth/google', async (req, res) => {
+app.use(cors({
+  origin: "http://localhost:5173", // Only allow requests from the frontend
+  methods: "GET,POST,PUT,DELETE,PATCH,OPTIONS",
+  allowedHeaders: "Content-Type,Authorization",
+  credentials: true, // For sending cookies
+}));
+
+// Google OAuth - Auth route
+app.post('/api/auth/google', async (req, res) => {
   try {
     const token = req.body.token; // Google token sent from frontend
     const ticket = await oAuth2Client.verifyIdToken({
@@ -51,16 +41,22 @@ app.post('/auth/google', async (req, res) => {
     const user = await User.findOne({ googleId: payload.sub });
 
     if (!user) {
-      // If the user doesn't exist, create a new one
+      // If user doesn't exist, create a new one
       const newUser = new User({
         googleId: payload.sub,
         email: payload.email,
         name: payload.name,
       });
       await newUser.save();
-      res.status(201).json(newUser); // Respond with the new user
+
+      // Generate JWT Token
+      const jwtToken = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+      return res.status(201).json({ token: jwtToken, user: newUser });
     } else {
-      res.status(200).json(user); // If the user exists, return the user data
+      // If user exists, generate JWT token
+      const jwtToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      return res.status(200).json({ token: jwtToken, user });
     }
   } catch (err) {
     console.error('Error verifying Google token:', err);
@@ -68,38 +64,30 @@ app.post('/auth/google', async (req, res) => {
   }
 });
 
-// Other routes (e.g., for user-related actions)
+// Other routes
 app.use("/api/user/", UserRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {
   const status = err.status || 500;
   const message = err.message || "Something went wrong";
-  return res.status(status).json({
-    success: false,
-    status,
-    message,
-  });
+  return res.status(status).json({ success: false, status, message });
 });
 
 // Root route
-app.get("/", async (req, res) => {
-  res.status(200).json({
-    message: "Hello developers from lorobek",
-  });
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "Hello developers from lorobek" });
 });
 
 // Database connection
-const connectDB = () => {
-  mongoose.set("strictQuery", true);
-  mongoose
-    .connect(process.env.MONGODB_URL)
-    .then(() => console.log("Connected to Mongo DB"))
-    .catch((err) => {
-      console.error("failed to connect with mongo");
-      console.log("MongoDB URL:", process.env.MONGODB_URL);
-      console.error(err);
-    });
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URL);
+    console.log("Connected to Mongo DB");
+  } catch (err) {
+    console.error("Failed to connect with Mongo");
+    console.error(err);
+  }
 };
 
 // Start server

@@ -8,7 +8,7 @@
     "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "", 
   "license": "ISC",
   "dependencies": {
     "@nestjs/passport": "^11.0.5",

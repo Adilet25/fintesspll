@@ -38,7 +38,7 @@ const SignIn = () => {
   const responseMessage = async (response) => {
     console.log(response);
     try {
-      const res = await fetch('https://fintesspll.onrender.com/api/auth/google/callback', {
+      const res = await fetch('http://localhost:8080/api/auth/google', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -123,6 +123,7 @@ const SignIn = () => {
         <GoogleLogin
           onSuccess={responseMessage} // Pass the Google response to the backend
           onError={(error) => console.log('Login Failed:', error)}
+          scope="profile email"
         />
       </div>
     </Container>
