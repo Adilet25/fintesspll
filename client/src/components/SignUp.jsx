@@ -43,6 +43,7 @@ const SignUp = () => {
   const handelSignUp = async () => {
     setLoading(true);
     setButtonDisabled(true);
+    console.log(name, email, password);
     if (validateInputs()) {
       await UserSignUp({ name, email, password })
         .then((res) => {
